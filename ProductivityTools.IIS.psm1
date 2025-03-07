@@ -35,19 +35,20 @@ function New-IISSiteIfDoesNotExist() {
     ValidateAdmin
     Push-Location $pwd
     cd $env:SystemRoot\system32\inetsrv
-    SET appcmd=CALL %WINDIR%\system32\inetsrv\appcmd
-    $exists = (.\appcmd.exe list apppool /name:$Name) -ne $null
+    $exists = (.\appcmd.exe list sites /name:$Name) -ne $null
+    Write-Host $exists
 
-    if ($exists -eq $false)
-    {
-        Write-Host 'App Pool does not exist'
+    if ($exists) {
+        Write-Verbose "App Pool $Name exists"
     }
-    else
-    {
-        Write-Host 'App Pool exists'
+    else {
+        Write-Verbose "App Pool $Name does not exist"
+        New-IISSite -Name $Name -BindingInformation $BindingInformation -PhysicalPath $PhysicalPath
+
     }
     Pop-Location
 
 }
 
+Export-ModuleMember New-IISSite
 Export-ModuleMember New-IISSiteIfDoesNotExist
